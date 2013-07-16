@@ -68,11 +68,11 @@ class Candidate(models.Model):
     party = models.CharField(max_length=100, verbose_name=("Parti politique"))
 
     def __unicode__(self):
-        return "%(slug)s %(last_name)s " \
-               "%(first_name)s %(initial)s" % {"slug": self.slug,
-                                               "last_name": self.last_name,
-                                               "first_name": self.first_name,
-                                               "initial": self.initial}
+        return "{slug} {last_name} " \
+               "{first_name} {initial}".format(slug=self.slug,
+                                               last_name=self.last_name,
+                                               first_name=self.first_name,
+                                               initial=self.initials)
 
 
 class Organization(models.Model):
@@ -81,24 +81,25 @@ class Organization(models.Model):
     name = models.CharField(max_length=100, verbose_name=("Nom"))
 
     def __unicode__(self):
-        return "%(name)s %(slug)s" % {"name": self.name, "slug": self.slug}
+        return "{name} {slug}".format(name=self.name, slug=self.slug)
 
 
 class Reporter(models.Model):
 
-    phone_number = models.CharField(max_length=30, verbose_name=("Numéro de téléphone"), null=True, blank=True)
+    phone_number = models.CharField(max_length=30, null=True, blank=True,
+                                    verbose_name=("Numéro de téléphone"))
     organization = models.ForeignKey('Organization', verbose_name=("Organisations"))
     voting_bureau = models.ForeignKey('Entity', verbose_name=("Bureau de vote"))
     name = models.CharField(max_length=100, null=True, blank=True)
 
     def __unicode__(self):
-        return "%(phone_number)s %(organization)s %(voting_bureau)s" % {"phone_number": self.phone_number,
-                                                                        "organization": self.organization,
-                                                                        "voting_bureau": self.voting_bureau}
+        return "{phone_number} {organization} " \
+               "{voting_bureau}".format(phone_number=self.phone_number,
+                                        organization=self.organization,
+                                        voting_bureau=self.voting_bureau)
 
 
 class Report(models.Model):
-    """ Le rapport envoyé par les assesseurs depuis le bureaux de votes"""
 
     class Meta:
         get_latest_by = "created_on"
@@ -110,17 +111,16 @@ class Report(models.Model):
     number_spoilt = models.PositiveIntegerField(verbose_name=("Nombre de nul"))
 
     def __unicode__(self):
-        return "%(created_on)s %(reporter)s" % {"created_on": self.created_on,
-                                                "reporter": self.reporter}
+        return "{created_on} {reporter}".format(created_on=self.created_on,
+                                                reporter=self.reporter)
 
 
 class VoteResult(models.Model):
-    """ le resultat de chanque candidat """
 
     report = models.ForeignKey('Report', verbose_name='Rapports')
     candidate = models.ForeignKey('Candidate', related_name='Candidats')
     votes = models.PositiveIntegerField(verbose_name=("Nombre de voix obtenues"))
 
     def __unicode__(self):
-        return "%(votes)s %(candidate)s" % {"votes": self.votes,
-                                            "candidate": self.candidate}
+        return "{votes} {candidate}".format(votes=self.votes,
+                                            candidate=self.candidate)
