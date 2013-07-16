@@ -49,9 +49,8 @@ class Entity(MPTTModel):
 
     def display_full_name(self):
         if self.parent:
-            return "%(name)s/%(parent)s" \
-                % {'name': self.display_name(),
-                   'parent': self.parent.display_name()}
+            return "%(name)s/%(parent)s" % {'name': self.display_name(),
+                                            'parent': self.parent.display_name()}
         return self.display_name()
 
     def parent_level(self):
@@ -66,17 +65,18 @@ class Candidate(models.Model):
     class Meta:
         get_latest_by = "last_name"
 
-    slug = models.CharField(max_length=20, primary_key=True)
+    slug = models.CharField(max_length=20, primary_key=True, verbose_name=("Code"))
     last_name = models.CharField(max_length=100, verbose_name=("Nom"))
     first_name = models.CharField(max_length=100, verbose_name=("Prénom"))
-    initial = models.CharField(max_length=100, verbose_name=("Nom"))
-    party = models.ForeignKey('Organization', unique=True,
-                              verbose_name=("Parti politiques"))
+    initial = models.CharField(max_length=100, verbose_name=("Initial"))
+    party = models.CharField(max_length=100, verbose_name=("Parti politiques"))
 
     def __unicode__(self):
-        return "%(last_name)s %(first_name)s %(initial)s" % {"last_name": self.last_name,
-                                                             "first_name": self.first_name,
-                                                             "initial": self.initial}
+        return "%(slug)s %(last_name)s " \
+               "%(first_name)s %(initial)s" % {"slug": self.slug,
+                                               "last_name": self.last_name,
+                                               "first_name": self.first_name,
+                                               "initial": self.initial}
 
 
 class Organization(models.Model):
@@ -85,8 +85,8 @@ class Organization(models.Model):
     class Meta:
         get_latest_by = "name"
 
-    slug = models.CharField(max_length=20, primary_key=True)
-    name = models.CharField(max_length=100, verbose_name=("Nom du parti"))
+    slug = models.CharField(max_length=20, primary_key=True, verbose_name=("Code"))
+    name = models.CharField(max_length=100, verbose_name=("Nom"))
 
     def __unicode__(self):
         return "%(name)s %(slug)s" % {"name": self.name, "slug": self.slug}
@@ -98,14 +98,14 @@ class Reporter(models.Model):
     class Meta:
         get_latest_by = "phone_number"
 
-    phone_number = models.CharField(max_length=30)
-    party = models.ForeignKey('Organization')
-    pollcenter = models.ForeignKey('Entity', verbose_name=("Lacalité"))
+    phone_number = models.CharField(max_length=30, verbose_name=("Numéro de téléphone"))
+    organization = models.ForeignKey('Organization', verbose_name=("Organisations"))
+    pollcenter = models.ForeignKey('Entity', verbose_name=("Bureau de vote"))
 
     def __unicode__(self):
-        return "%(phone_number)s %(party)s %(pollcenter)s" % {"phone_number": self.phone_number,
-                                                              "party": self.party,
-                                                              "pollcenter": self.pollcenter}
+        return "%(phone_number)s %(organization)s %(pollcenter)s" % {"phone_number": self.phone_number,
+                                                                     "organization": self.organization,
+                                                                     "pollcenter": self.pollcenter}
 
 
 class Report(models.Model):
@@ -114,12 +114,11 @@ class Report(models.Model):
     class Meta:
         get_latest_by = "created_on"
 
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateTimeField(auto_now_add=True, verbose_name=("Date de création"))
     reporter = models.ForeignKey('Reporter', verbose_name=("Rapporteur"))
-    number_voters = models.PositiveIntegerField(verbose_name=("nombre de votants"))
-    number_registered = models.PositiveIntegerField(verbose_name=("nombre d'inscrit"))
-    spoiled_ballot = models.PositiveIntegerField(verbose_name=("bulletin nul"))
-    # abstention = models.PositiveIntegerField(verbose_name=("abstention"))
+    number_voters = models.PositiveIntegerField(verbose_name=("Nombre de votants"))
+    number_registered = models.PositiveIntegerField(verbose_name=("Nombre d'inscrit"))
+    spoiled_ballot = models.PositiveIntegerField(verbose_name=("Bulletin nul"))
 
     def __unicode__(self):
         return "%(created_on)s %(reporter)s" % {"created_on": self.created_on,
@@ -129,8 +128,11 @@ class Report(models.Model):
 class Vote(models.Model):
     """ le resultat de chanque candidat """
 
+    class Meta:
+        get_latest_by = "votes_obtained"
+
     report = models.ForeignKey('Report', verbose_name='Rapports')
-    candidate = models.ForeignKey('Candidate', related_name='candidat')
+    candidate = models.ForeignKey('Candidate', related_name='Candidats')
     votes_obtained = models.PositiveIntegerField(verbose_name=("Nombre de voix obtenu"))
 
     def __unicode__(self):

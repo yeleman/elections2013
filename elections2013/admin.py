@@ -12,8 +12,8 @@ from elections2013.models import (Entity, Candidate, Organization,
 
 
 class CustomCandidate(admin.ModelAdmin):
-    list_display = ("last_name", "first_name", "party")
-    list_filter = ("last_name", "first_name", "party")
+    list_display = ("slug", "initial", "first_name", "last_name", "party")
+    list_filter = ("party",)
 
 
 class CustomOrganization(admin.ModelAdmin):
@@ -27,8 +27,8 @@ class CustomEntity(admin.ModelAdmin):
 
 
 class CustomReporter(admin.ModelAdmin):
-    list_display = ("phone_number", "party",)
-    list_filter = ("phone_number", "party")
+    list_display = ("phone_number", "organization",)
+    list_filter = ("organization",)
 
 
 class ModelInline(admin.StackedInline):
@@ -37,15 +37,15 @@ class ModelInline(admin.StackedInline):
 
 
 class CustomReport(admin.ModelAdmin):
-    list_display = ("created_on", "reporter", "number_voters",
-                    "number_registered", "spoiled_ballot")
+    list_display = ("created_on", "reporter", "number_registered",
+                    "number_voters", "spoiled_ballot")
     # list_filter = ("result",)
     inlines = [ModelInline]
 
 
 class CustomVote(admin.ModelAdmin):
     list_display = ("votes_obtained", "candidate")
-    list_filter = ("votes_obtained",)
+    list_filter = ("report__reporter__organization",)
 
 admin.site.register(Candidate, CustomCandidate)
 admin.site.register(Organization, CustomOrganization)
