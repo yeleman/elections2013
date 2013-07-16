@@ -39,7 +39,6 @@ class ModelInline(admin.StackedInline):
 class CustomReport(admin.ModelAdmin):
     list_display = ("created_on", "reporter", "number_registered",
                     "number_voters", "number_spoilt")
-    # list_filter = ("result",)
     inlines = [ModelInline]
 
 

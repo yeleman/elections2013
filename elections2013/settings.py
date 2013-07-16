@@ -122,7 +122,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'elections2013',
-    'django_extensions'
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
