@@ -12,15 +12,17 @@ from mptt.managers import TreeManager
 
 class Entity(MPTTModel):
 
+    TYPE_PAYS = 'pays'
     TYPE_REGION = 'region'
     TYPE_CERCLE = 'cercle'
     TYPE_ARRONDISSEMENT = 'arrondissement'
     TYPE_COMMUNE = 'commune'
     TYPE_VILLAGE = 'village'
-    TYPE_CENTER = 'Centre'
-    TYPE_BUREAU = 'Bureau'
+    TYPE_CENTER = 'centre'
+    TYPE_BUREAU = 'bureau'
 
     TYPES = {
+        TYPE_PAYS: "Pays",
         TYPE_REGION: "Région",
         TYPE_CERCLE: "Cercle",
         TYPE_ARRONDISSEMENT: "Arrondissement",
@@ -66,6 +68,8 @@ class Candidate(models.Model):
     first_name = models.CharField(max_length=100, verbose_name=("Prénom"))
     initials = models.CharField(max_length=100, verbose_name=("Initiales"))
     party = models.CharField(max_length=100, verbose_name=("Parti politique"))
+    entity = models.ForeignKey('Entity', blank=True, null=True,
+                               verbose_name=("Localité"))
 
     def __unicode__(self):
         return "{slug} {last_name} " \
